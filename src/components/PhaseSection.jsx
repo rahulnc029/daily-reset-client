@@ -8,10 +8,14 @@ function PhaseSection({
     fetchTasks,
 }) {
     return (
-        <section className="rounded-2xl bg-white p-5 shadow-sm">
-            <h2 className="mb-4 text-xl font-semibold text-slate-800">
-                {title}
-            </h2>
+        <section>
+            <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-xl font-medium">
+                    {title}
+                </h2>
+
+                <div className="h-px flex-1 bg-slate-200 ml-4" />
+            </div>
 
             <div className="space-y-3">
                 {tasks.map((task) => (

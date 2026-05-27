@@ -29,28 +29,24 @@ function App() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      <div className="mx-auto max-w-4xl px-4 py-8">
+    <div className="min-h-screen bg-stone-50 text-slate-800">
+      <main className="mx-auto max-w-3xl px-6 py-12">
 
-        <div className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
-          <h1 className="text-3xl font-bold text-slate-800">
+        <header className="mb-12">
+          <h1 className="text-4xl font-semibold tracking-tight">
             Daily Reset
           </h1>
 
-          <h2 className="mt-2 text-lg font-medium text-slate-600">
-            {dayName}
-          </h2>
-
-          <p className="text-sm text-slate-500">
-            {dateText}
+          <p className="mt-2 text-slate-500">
+            {dayName} · {dateText}
           </p>
 
           <div className="mt-6">
             <ProgressBar tasks={tasks} />
           </div>
-        </div>
+        </header>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="space-y-12">
           <PhaseSection
             title="Morning"
             phase="morning"
@@ -78,7 +74,7 @@ function App() {
             fetchTasks={fetchTasks}
           />
         </div>
-      </div>
+      </main>
     </div>
   );
 }
