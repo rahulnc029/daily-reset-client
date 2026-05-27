@@ -3,13 +3,22 @@ import api from "./services/api";
 
 import PhaseSection from "./components/PhaseSection";
 import ProgressBar from "./components/ProgressBar";
+import Loader from "./components/Loader";
 
 function App() {
   const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchTasks = async () => {
-    const res = await api.get("/tasks");
-    setTasks(res.data);
+    try {
+      setLoading(true);
+      const res = await api.get("/tasks");
+      setTasks(res.data);
+    } catch (error) {
+      console.log(`Error fetching tasks: ${error}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -27,6 +36,14 @@ function App() {
     month: "long",
     year: "numeric",
   });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-stone-50">
+        <Loader />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-stone-50 text-slate-800">
@@ -47,32 +64,16 @@ function App() {
         </header>
 
         <div className="space-y-12">
-          <PhaseSection
-            title="Morning"
-            phase="morning"
-            tasks={tasks.filter(
-              (t) => t.phase === "morning"
-            )}
-            fetchTasks={fetchTasks}
-          />
-
-          <PhaseSection
-            title="Afternoon"
-            phase="afternoon"
-            tasks={tasks.filter(
-              (t) => t.phase === "afternoon"
-            )}
-            fetchTasks={fetchTasks}
-          />
-
-          <PhaseSection
-            title="Evening"
-            phase="evening"
-            tasks={tasks.filter(
-              (t) => t.phase === "evening"
-            )}
-            fetchTasks={fetchTasks}
-          />
+          {["morning", "afternoon", "evening"].map((phase) => (
+            <PhaseSection
+              key={phase}
+              title={phase.charAt(0).toUpperCase() + phase.slice(1)}
+              phase={phase}
+              tasks={tasks.filter((t) => t.phase === phase)}
+              fetchTasks={fetchTasks}
+            />
+          ))
+          }
         </div>
       </main>
     </div>

@@ -1,26 +1,35 @@
 import { useState } from "react";
 import api from "../services/api";
+import Loader from "./Loader";
 
 function AddTaskForm({
     phase,
     fetchTasks,
 }) {
-    const [title, setTitle] =
-        useState("");
+    const [title, setTitle] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!title.trim()) return;
 
-        await api.post("/tasks", {
-            title,
-            phase,
-        });
+        try {
+            setLoading(true);
+            await api.post("/tasks", {
+                title,
+                phase,
+            });
 
-        setTitle("");
+            setTitle("");
 
-        fetchTasks();
+            fetchTasks();
+
+        } catch (error) {
+            console.log(`Error in Adding Tasks: ${error}`);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -31,17 +40,20 @@ function AddTaskForm({
             <input
                 type="text"
                 value={title}
+                disabled={loading}
                 placeholder="Add task"
                 onChange={(e) =>
                     setTitle(e.target.value)
                 }
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
             />
 
             <button
-                className="w-full rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 sm:w-auto"
+                type="submit"
+                disabled={loading}
+                className="w-full sm:w-auto rounded-lg bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
             >
-                Add
+                {loading ? <Loader size="sm" /> : "Add"}
             </button>
         </form>
     );
