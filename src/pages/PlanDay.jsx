@@ -26,7 +26,7 @@ function PlanDay() {
                             onClick={() => setPhase(item)}
                             className={phase === item ? "rounded-lg bg-blue-600 px-4 py-2 text-white" : "rounded-lg border px-4 py-2"}
                         >
-                            {item}
+                            {item.charAt(0).toUpperCase() + item.slice(1)}
                         </button>
                     ))}
                 </div>

@@ -59,9 +59,28 @@ function Dashboard() {
                         </p>
                     </div>
 
-                    <Link to="/plan" className="rounded-lg bg-blue-600 px-4 py-2 text-white">
-                        Plan Day
-                    </Link>
+                    <div className="flex flex-wrap gap-3">
+                        <Link
+                            to="/plan"
+                            className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition"
+                        >
+                            Plan Day
+                        </Link>
+
+                        <Link
+                            to="/workout"
+                            className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700 transition"
+                        >
+                            Workout
+                        </Link>
+
+                        <Link
+                            to="/workout/plan"
+                            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-slate-700 hover:bg-slate-100 transition"
+                        >
+                            Workout Plan
+                        </Link>
+                    </div>
                 </div>
 
                 <ProgressBar tasks={tasks} />
