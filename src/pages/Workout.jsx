@@ -44,7 +44,7 @@ function Workout() {
                 res.data.map((e) => ({
                     exerciseId: e._id,
                     name: e.name,
-                    sets: [0, 0, 0],
+                    sets: e.sets || [0, 0, 0],
                 }));
 
             setExercises(formatted);
@@ -66,6 +66,16 @@ function Workout() {
 
     const saveWorkout =
         async () => {
+
+            await Promise.all(
+                exercises.map((exercise) => api.patch(
+                    `/workout/exercises/${exercise.exerciseId}`,
+                    {
+                        name: exercise.name,
+                        sets: exercise.sets,
+                    }
+                ))
+            );
             await api.post("/workout/today",
                 {
                     exercises,
