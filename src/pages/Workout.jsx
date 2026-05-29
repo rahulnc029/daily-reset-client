@@ -4,14 +4,11 @@ import {
 } from "react";
 
 import { Link } from "react-router-dom";
-
 import api from "../services/api";
 
 function Workout() {
     const [exercises, setExercises] = useState([]);
-
     const [seconds, setSeconds] = useState(0);
-
     const [running, setRunning] = useState(false);
 
     useEffect(() => {
@@ -23,32 +20,28 @@ function Workout() {
 
         if (running) {
             timer = setInterval(() => {
-                setSeconds(
-                    (prev) => prev + 1
-                );
+                setSeconds((prev) => prev + 1);
             }, 1000);
         }
 
-        return () =>
-            clearInterval(timer);
+        return () => clearInterval(timer);
     }, [running]);
 
-    const fetchExercises =
-        async () => {
-            const res =
-                await api.get(
-                    "/workout/exercises"
-                );
+    const fetchExercises = async () => {
+        const res = await api.get("/workout/exercises");
 
-            const formatted =
-                res.data.map((e) => ({
-                    exerciseId: e._id,
-                    name: e.name,
-                    sets: e.sets || [0, 0, 0],
-                }));
+        const formatted =
+            res.data.map((e) => ({
+                exerciseId: e._id,
+                name: e.name,
+                sets: e.reps.map((rep) => ({
+                    reps: rep,
+                    completed: false,
+                })),
+            }));
 
-            setExercises(formatted);
-        };
+        setExercises(formatted);
+    };
 
     const updateSet = (
         exerciseId,
@@ -56,79 +49,71 @@ function Workout() {
         value
     ) => {
         setExercises((prev) =>
-            prev.map((e) => e.exerciseId === exerciseId ? {
-                ...e,
-                sets: e.sets.map((set, i) => i === index ? Number(value) : set),
-            } : e
+            prev.map((e) =>
+                e.exerciseId === exerciseId
+                    ? {
+                        ...e,
+                        sets: e.sets.map((set, i) =>
+                            i === index
+                                ? Number(value)
+                                : set
+                        ),
+                    }
+                    : e
             )
         );
     };
 
-    const saveWorkout =
-        async () => {
-
-            await Promise.all(
-                exercises.map((exercise) => api.patch(
-                    `/workout/exercises/${exercise.exerciseId}`,
-                    {
-                        name: exercise.name,
-                        sets: exercise.sets,
-                    }
-                ))
-            );
-            await api.post("/workout/today",
-                {
-                    exercises,
-                    durationInSeconds: seconds,
-                }
-            );
-        };
+    const saveWorkout = async () => {
+        await api.post("/workout/today", {
+            exercises,
+            durationInSeconds: seconds,
+        });
+    };
 
     return (
-        <div className="min-h-screen bg-stone-50">
-            <main className="mx-auto max-w-3xl p-6">
+        <div className="min-h-screen bg-slate-100 pb-28">
+            <main className="mx-auto max-w-2xl px-4 py-6">
 
-                <Link
-                    to="/"
-                    className="text-blue-600"
-                >
-                    ← Back to Dashboard
-                </Link>
+                <div className="mb-8 flex items-center justify-between">
 
-                <div className="mt-6 mb-8 flex items-center justify-between">
-
-                    <h1 className="text-3xl font-semibold">
-                        Workout Tracker
-                    </h1>
+                    <Link
+                        to="/"
+                        className="text-slate-600"
+                    >
+                        ← Dashboard
+                    </Link>
 
                     <Link
                         to="/workout/plan"
-                        className="rounded-lg border px-4 py-2"
+                        className="rounded-xl bg-white px-4 py-2 shadow-sm"
                     >
-                        Manage Exercises
+                        Manage
                     </Link>
 
                 </div>
 
-                <div className="mb-10 rounded-xl bg-white p-6 shadow-sm">
+                <div className="mb-8 rounded-3xl bg-slate-900 p-8 text-white shadow-lg">
 
-                    <p className="text-3xl font-semibold mb-4">
-                        {Math.floor(
-                            seconds / 60
-                        )}
-                        m
-                        {" "}
-                        {seconds % 60}
-                        s
+                    <p className="text-sm uppercase tracking-wider text-slate-400">
+                        Workout Timer
                     </p>
 
-                    <div className="flex gap-3">
+                    <h1 className="mt-3 text-5xl font-bold">
+                        {Math.floor(seconds / 60)}
+                        :
+                        {String(
+                            seconds % 60
+                        ).padStart(2, "0")}
+                    </h1>
+
+                    <div className="mt-6 flex gap-3">
 
                         <button
                             onClick={() =>
                                 setRunning(true)
                             }
-                            className="rounded bg-green-600 px-4 py-2 text-white"
+                            className="rounded-xl bg-green-500 px-5 py-2 font-medium"
                         >
                             Start
                         </button>
@@ -137,22 +122,17 @@ function Workout() {
                             onClick={() =>
                                 setRunning(false)
                             }
-                            className="rounded bg-yellow-500 px-4 py-2 text-white"
+                            className="rounded-xl bg-yellow-500 px-5 py-2 font-medium"
                         >
                             Pause
                         </button>
 
                         <button
                             onClick={() => {
-                                setRunning(
-                                    false
-                                );
-
-                                setSeconds(
-                                    0
-                                );
+                                setRunning(false);
+                                setSeconds(0);
                             }}
-                            className="rounded bg-red-500 px-4 py-2 text-white"
+                            className="rounded-xl bg-red-500 px-5 py-2 font-medium"
                         >
                             Reset
                         </button>
@@ -160,67 +140,62 @@ function Workout() {
                     </div>
                 </div>
 
-                <div className="space-y-8">
-                    {exercises.map(
-                        (exercise) => (
-                            <div
-                                key={
-                                    exercise.exerciseId
-                                }
-                                className="rounded-xl bg-white p-5 shadow-sm"
-                            >
-                                <h2 className="mb-4 text-lg font-medium">
-                                    {
-                                        exercise.name
-                                    }
-                                </h2>
+                <div className="space-y-5">
 
-                                <div className="grid grid-cols-3 gap-3">
+                    {exercises.map((exercise) => (
+                        <div
+                            key={exercise.exerciseId}
+                            className="rounded-3xl bg-white p-6 shadow-sm"
+                        >
 
-                                    {exercise.sets.map(
-                                        (
-                                            reps,
-                                            index
-                                        ) => (
-                                            <input
-                                                key={
-                                                    index
-                                                }
-                                                type="number"
-                                                value={
-                                                    reps
-                                                }
-                                                placeholder={`Set ${index + 1
-                                                    }`}
-                                                onChange={(
-                                                    e
-                                                ) =>
-                                                    updateSet(
-                                                        exercise.exerciseId,
-                                                        index,
-                                                        e.target
-                                                            .value
-                                                    )
-                                                }
-                                                className="border rounded px-3 py-2"
-                                            />
-                                        )
-                                    )}
+                            <h2 className="mb-5 text-xl font-semibold">
+                                {exercise.name}
+                            </h2>
 
-                                </div>
+                            <div className="space-y-3">
+
+                                {exercise.sets.map((set, index) => (
+                                    <div key={index} className="flex items-center justify-between border rounded px-4 py-3">
+                                        <span>
+                                            Set {index + 1}
+                                        </span>
+
+                                        <span>
+                                            {set.reps} reps
+                                        </span>
+
+                                        <input
+                                            type="checkbox"
+                                            checked={set.completed}
+                                            onChange={() => setExercises((prev) => prev.map((e) => e.exerciseId === exercise.exerciseId ? {
+                                                ...e,
+                                                sets: e.sets.map((s, i) => i === index ? {
+                                                    ...s,
+                                                    completed: !s.completed,
+                                                } : s),
+                                            } : e
+                                            ))}
+                                        />
+                                    </div>
+                                )
+
+                                )}
+
                             </div>
-                        )
-                    )}
-                </div>
+                        </div>
+                    ))}
 
+                </div>
+            </main>
+
+            <div className="fixed bottom-0 left-0 right-0 bg-white p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
                 <button
                     onClick={saveWorkout}
-                    className="mt-10 w-full rounded-lg bg-blue-600 py-3 text-white"
+                    className="mx-auto block w-full max-w-2xl rounded-2xl bg-blue-600 py-4 text-lg font-medium text-white"
                 >
                     Save Workout
                 </button>
-
-            </main>
+            </div>
         </div>
     );
 }
