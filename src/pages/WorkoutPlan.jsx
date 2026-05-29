@@ -1,20 +1,18 @@
-import {
-    useEffect,
-    useState,
-} from "react";
-
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
 
 function WorkoutPlan() {
     const [exercises, setExercises] = useState([]);
+
     const [name, setName] = useState("");
     const [sets, setSets] = useState(3);
     const [reps, setReps] = useState([0, 0, 0]);
 
+    const [editingId, setEditingId] = useState(null);
+
     const fetchExercises = async () => {
         const res = await api.get("/workout/exercises");
-
         setExercises(res.data);
     };
 
@@ -23,26 +21,50 @@ function WorkoutPlan() {
     }, []);
 
     const updateRep = (index, value) => {
-        setReps((prev) => prev.map((rep, i) => i === index ? Number(value) : rep));
+        setReps((prev) =>
+            prev.map((rep, i) =>
+                i === index ? Number(value) : rep
+            )
+        );
     };
 
-    const addExercise = async (e) => {
-        e.preventDefault();
-
-        await api.post(
-            "/workout/exercises",
-            {
-                name,
-                sets,
-                reps,
-            }
-        );
-
+    const resetForm = () => {
         setName("");
         setSets(3);
         setReps([0, 0, 0]);
+        setEditingId(null);
+    };
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const payload = {
+            name,
+            sets,
+            reps,
+        };
+
+        if (editingId) {
+            await api.patch(
+                `/workout/exercises/${editingId}`,
+                payload
+            );
+        } else {
+            await api.post(
+                "/workout/exercises",
+                payload
+            );
+        }
+
+        resetForm();
         fetchExercises();
+    };
+
+    const editExercise = (exercise) => {
+        setEditingId(exercise._id);
+        setName(exercise.name);
+        setSets(exercise.sets);
+        setReps(exercise.reps);
     };
 
     const deleteExercise = async (id) => {
@@ -55,6 +77,7 @@ function WorkoutPlan() {
 
     return (
         <div className="max-w-3xl mx-auto p-6">
+
             <Link to="/workout">
                 ← Back
             </Link>
@@ -64,26 +87,34 @@ function WorkoutPlan() {
             </h1>
 
             <form
-                onSubmit={addExercise}
+                onSubmit={handleSubmit}
                 className="space-y-4 rounded-xl bg-white p-6"
             >
+
                 <input
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) =>
+                        setName(e.target.value)
+                    }
                     placeholder="Exercise Name"
                     className="w-full border rounded px-4 py-2"
                 />
 
                 <input
                     type="number"
+                    value={sets}
                     min="1"
                     max="10"
-                    value={sets}
                     onChange={(e) => {
-                        const value = Number(e.target.value);
-                        if(value < 1 || value > 10) return;
+                        const value = Number(
+                            e.target.value
+                        );
+
                         setSets(value);
-                        setReps(Array(value).fill(0));
+
+                        setReps(
+                            Array(value).fill(0)
+                        );
                     }}
                     className="w-full border rounded px-4 py-2"
                 />
@@ -91,46 +122,72 @@ function WorkoutPlan() {
                 <div className="grid grid-cols-3 gap-3">
                     {reps.map((rep, index) => (
                         <input
-                            type="number"
                             key={index}
+                            type="number"
                             value={rep}
-                            placeholder={`Set ${index + 1} reps`}
-                            onChange={(e) => updateRep(index, e.target.value)}
+                            placeholder={`Set ${index + 1}`}
+                            onChange={(e) =>
+                                updateRep(
+                                    index,
+                                    e.target.value
+                                )
+                            }
                             className="border rounded px-3 py-2"
                         />
                     ))}
                 </div>
 
                 <button className="rounded bg-blue-600 px-6 py-2 text-white">
-                    Add Exercise
+                    {editingId
+                        ? "Update Exercise"
+                        : "Add Exercise"}
                 </button>
+
             </form>
 
             <div className="mt-8 space-y-4">
                 {exercises.map((exercise) => (
-                    <div key={exercise._id} className="rounded-xl bg-white p-5 shadow-sm">
-                        <div className="mb-3 flex items-start justify-between">
+                    <div
+                        key={exercise._id}
+                        className="rounded-xl bg-white p-5 shadow-sm"
+                    >
+                        <div className="flex justify-between">
+
                             <div>
-                                <h2 className="font-semibold text-lg">
+                                <h2 className="font-semibold">
                                     {exercise.name}
                                 </h2>
-                                <p className="text-sm text-slate-500">{exercise.sets} sets</p>
+
+                                <p className="text-sm text-slate-500">
+                                    {exercise.sets} sets
+                                </p>
                             </div>
 
-                            <button
-                                onClick={() => deleteExercise(exercise._id)}
-                                className="rounded-lg px-3 py-1 text-sm text-red-500 hover:bg-red-50"
-                            >
-                                Delete
-                            </button>
-                        </div>
+                            <div className="flex gap-2">
 
-                        <div className="mt-2 flex gap-2">
-                            {exercise.reps.map((rep, index) => (
-                                <span key={index} className="rounded bg-slate-100 px-3 py-1 text-sm">
-                                    Set {index + 1}: {rep}
-                                </span>
-                            ))}
+                                <button
+                                    onClick={() =>
+                                        editExercise(
+                                            exercise
+                                        )
+                                    }
+                                    className="text-blue-600 text-sm"
+                                >
+                                    Edit
+                                </button>
+
+                                <button
+                                    onClick={() =>
+                                        deleteExercise(
+                                            exercise._id
+                                        )
+                                    }
+                                    className="text-red-500 text-sm"
+                                >
+                                    Delete
+                                </button>
+
+                            </div>
                         </div>
                     </div>
                 ))}
