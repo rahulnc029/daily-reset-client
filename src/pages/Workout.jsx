@@ -91,6 +91,13 @@ function Workout() {
                         Manage
                     </Link>
 
+                    <Link
+                        to="/workout/calendar"
+                        className="rounded-xl bg-white px-4 py-2 shadow-sm"
+                    >
+                        Calendar
+                    </Link>
+
                 </div>
 
                 <div className="mb-8 rounded-3xl bg-slate-900 p-8 text-white shadow-lg">

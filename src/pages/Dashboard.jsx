@@ -46,60 +46,63 @@ function Dashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-stone-50">
-            <main className="mx-auto max-w-3xl px-6 py-12">
-                <div className="mb-8 flex items-center justify-between">
-                    <div>
-                        <h1 className="text-4xl font-semibold">
-                            Daily Reset
-                        </h1>
+        <div className="min-h-screen bg-slate-100 pb-10">
+            <main className="mx-auto max-w-2xl px-4 py-6">
+                <div className="mb-6">
+                    <h1 className="text-3xl font-bold text-slate-900">
+                        Daily Reset
+                    </h1>
 
-                        <p className="mt-2 text-slate-500">
-                            {dayName} . {dateText}
-                        </p>
-                    </div>
-
-                    <div className="flex flex-wrap gap-3">
-                        <Link
-                            to="/plan"
-                            className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition"
-                        >
-                            Plan Day
-                        </Link>
-
-                        <Link
-                            to="/workout"
-                            className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700 transition"
-                        >
-                            Workout
-                        </Link>
-
-                        <Link
-                            to="/workout/plan"
-                            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-slate-700 hover:bg-slate-100 transition"
-                        >
-                            Workout Plan
-                        </Link>
-                    </div>
+                    <p className="mt-1 text-slate-500">
+                        {dayName} • {dateText}
+                    </p>
                 </div>
 
-                <ProgressBar tasks={tasks} />
+                <div className="mb-8 grid grid-cols-2 gap-4">
+                    <Link to="/plan" className="rounded-3xl bg-white p-5 shadow-sm active:scale-[0.98] transition">
+                        <p className="text-3xl mb-3">+</p>
+                        <h2 className="font-semibold text-lg">Plan Day</h2>
+                        <p className="text-sm text-slate-500 mt-1">Add daily tasks</p>
+                    </Link>
 
-                <div className="mt-10 space-y-10">
+                    <Link to="/workout" className="rounded-3xl bg-white p-5 shadow-sm active:scale-[0.98] transition">
+                        <p className="text-3xl mb-3">💪</p>
+                        <h2 className="font-semibold text-lg">Workout</h2>
+                        <p className="text-sm text-slate-500 mt-1">Start workout</p>
+                    </Link>
+
+                    <Link to="/workout/plan" className="rounded-3xl bg-white p-5 shadow-sm active:scale-[0.98] transition">
+                        <p className="text-3xl mb-3">🏋️</p>
+                        <h2 className="font-semibold text-lg">Workout Plan</h2>
+                        <p className="text-sm text-slate-500 mt-1">Manage exercises</p>
+                    </Link>
+
+                    <Link to="/workout/calendar" className="rounded-3xl bg-white p-5 shadow-sm active:scale-[0.98] transition">
+                        <p className="text-3xl mb-3">📅</p>
+                        <h2 className="font-semibold text-lg">Calendar</h2>
+                        <p className="text-sm text-slate-500 mt-1">Track consistency</p>
+                    </Link>
+                </div>
+
+                <div className="rounded-3xl bg-white p-5 shadow-sm">
+                    <ProgressBar tasks={tasks}/>
+                </div>
+
+                <div className="mt-8 space-y-8">
                     <PhaseSection
-                        title="Morning"
-                        tasks={tasks.filter((t) => t.phase === "morning")}
-                        fetchTasks={fetchTasks}
+                    title="Morning"
+                    tasks={tasks.filter((t) => t.phase === "morning")}
+                    fetchTasks={fetchTasks}
                     />
                     <PhaseSection
-                        title="Afternoon"
-                        tasks={tasks.filter((t) => t.phase === "afternoon")}
-                        fetchTasks={fetchTasks}
+                    title="Afternoon"
+                    tasks={tasks.filter((t) => t.phase === "afternoon")}
+                    fetchTasks={fetchTasks}
                     />
                     <PhaseSection
-                        title="Evening"
-                        tasks={tasks.filter((t) => t.phase === "evening")}
-                        fetchTasks={fetchTasks}
+                    title="Evening"
+                    tasks={tasks.filter((t) => t.phase === "evening")}
+                    fetchTasks={fetchTasks}
                     />
                 </div>
             </main>
