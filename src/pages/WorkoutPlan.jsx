@@ -21,7 +21,7 @@ function WorkoutPlan() {
 
         if (!name.trim()) return;
 
-        await api.post("/workout/exercise", { name });
+        await api.post("/workout/exercises", { name });
 
         setName("");
         fetchExercises();

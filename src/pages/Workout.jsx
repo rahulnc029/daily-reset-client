@@ -8,14 +8,11 @@ import { Link } from "react-router-dom";
 import api from "../services/api";
 
 function Workout() {
-    const [exercises, setExercises] =
-        useState([]);
+    const [exercises, setExercises] = useState([]);
 
-    const [seconds, setSeconds] =
-        useState(0);
+    const [seconds, setSeconds] = useState(0);
 
-    const [running, setRunning] =
-        useState(false);
+    const [running, setRunning] = useState(false);
 
     useEffect(() => {
         fetchExercises();
@@ -59,37 +56,20 @@ function Workout() {
         value
     ) => {
         setExercises((prev) =>
-            prev.map((e) =>
-                e.exerciseId ===
-                    exerciseId
-                    ? {
-                        ...e,
-                        sets:
-                            e.sets.map(
-                                (
-                                    set,
-                                    i
-                                ) =>
-                                    i === index
-                                        ? Number(
-                                            value
-                                        )
-                                        : set
-                            ),
-                    }
-                    : e
+            prev.map((e) => e.exerciseId === exerciseId ? {
+                ...e,
+                sets: e.sets.map((set, i) => i === index ? Number(value) : set),
+            } : e
             )
         );
     };
 
     const saveWorkout =
         async () => {
-            await api.post(
-                "/workout/today",
+            await api.post("/workout/today",
                 {
                     exercises,
-                    durationInSeconds:
-                        seconds,
+                    durationInSeconds: seconds,
                 }
             );
         };
