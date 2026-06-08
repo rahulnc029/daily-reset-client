@@ -69,23 +69,46 @@ function Workout() {
 
     const saveWorkout = async () => {
         try {
+            const allCompleted =
+                exercises.every(
+                    (exercise) =>
+                        exercise.sets.every(
+                            (set) =>
+                                set.completed
+                        )
+                );
+
+            if (!allCompleted) {
+                alert(
+                    "Complete all sets before saving workout."
+                );
+                return;
+            }
+
             setSaving(true);
 
-            const allCompleted = exercises.every((exercise) => exercise.sets.every((set) => set.completed));
+            await api.post(
+                "/workout/today",
+                {
+                    exercises,
+                    durationInSeconds:
+                        seconds,
+                }
+            );
 
-            await api.post("/workout/today", {
-                exercises,
-                durationInSeconds: seconds,
-            });
+            alert(
+                "Workout saved successfully."
+            );
 
-            if(allCompleted) {
-                alert("Workout completed successfully");
-                navigate("/workout/calendar");
-            } else {
-                alert("Workout saved as incomplete");
-            }
+            navigate(
+                "/workout/calendar"
+            );
         } catch (error) {
-            alert("Failed to save workout");
+            alert(
+                error.response?.data
+                    ?.message ||
+                "Failed to save workout"
+            );
         } finally {
             setSaving(false);
         }
@@ -219,9 +242,11 @@ function Workout() {
                 <button
                     onClick={saveWorkout}
                     disabled={saving}
-                    className="mx-auto block w-full max-w-2xl rounded-2xl bg-blue-600 py-4 text-lg font-medium text-white"
+                    className="mx-auto block w-full max-w-2xl rounded-2xl bg-blue-600 py-4 text-lg font-medium text-white disabled:opacity-50"
                 >
-                    {saving ? "Saving..." : "Save Workout"}
+                    {saving
+                        ? "Saving..."
+                        : "Save Workout"}
                 </button>
             </div>
         </div>
