@@ -3,13 +3,16 @@ import {
     useState,
 } from "react";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 function Workout() {
     const [exercises, setExercises] = useState([]);
     const [seconds, setSeconds] = useState(0);
     const [running, setRunning] = useState(false);
+    const [saving, setSaving] = useState(false);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchExercises();
@@ -65,10 +68,27 @@ function Workout() {
     };
 
     const saveWorkout = async () => {
-        await api.post("/workout/today", {
-            exercises,
-            durationInSeconds: seconds,
-        });
+        try {
+            setSaving(true);
+
+            const allCompleted = exercises.every((exercise) => exercise.sets.every((set) => set.completed));
+
+            await api.post("/workout/today", {
+                exercises,
+                durationInSeconds: seconds,
+            });
+
+            if(allCompleted) {
+                alert("Workout completed successfully");
+                navigate("/workout/calendar");
+            } else {
+                alert("Workout saved as incomplete");
+            }
+        } catch (error) {
+            alert("Failed to save workout");
+        } finally {
+            setSaving(false);
+        }
     };
 
     return (
@@ -198,9 +218,10 @@ function Workout() {
             <div className="fixed bottom-0 left-0 right-0 bg-white p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
                 <button
                     onClick={saveWorkout}
+                    disabled={saving}
                     className="mx-auto block w-full max-w-2xl rounded-2xl bg-blue-600 py-4 text-lg font-medium text-white"
                 >
-                    Save Workout
+                    {saving ? "Saving..." : "Save Workout"}
                 </button>
             </div>
         </div>
